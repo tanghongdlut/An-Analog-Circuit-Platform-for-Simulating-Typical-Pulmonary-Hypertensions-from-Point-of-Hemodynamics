@@ -46,7 +46,7 @@ L=[0.001  0.001  0.001 ];
 %% Load initial values at t=0s
 % Include heart chamber and vascular volume, and systemic and pulmonary aorta flow,
 
-load yinit_VSD.mat   
+load yinit6.mat   
 yinit=yinit6;    
 
 %% Adjustable part
@@ -102,10 +102,10 @@ for t=0:step:Tall
     %% The P-V relationship of four chambers
     ttemp=t-sum(HrT(1:beatNum)); % At the current moment of a new cardiac cycle
     beatNumN=beatNum;
-    Plv=mycallP_VSD(Vlv,ttemp,Fcon(num),1,0);        % Left ventricle
-    Pla=mycallP_VSD(Vla,ttemp,Fcon(num),3,beatNumN);  % Left atrium
-    Prv=mycallP_VSD(Vrv,ttemp,Fcon(num),2,beatNumN); % Right ventricle
-    Pra=mycallP_VSD(Vra,ttemp,Fcon(num),4,0);          % Right atrium 
+    Plv=mycallP(Vlv,ttemp,Fcon(num),1,0);        % Left ventricle
+    Pla=mycallP(Vla,ttemp,Fcon(num),3,beatNumN);  % Left atrium
+    Prv=mycallP(Vrv,ttemp,Fcon(num),2,beatNumN); % Right ventricle
+    Pra=mycallP(Vra,ttemp,Fcon(num),4,0);          % Right atrium 
        
     %% P-V relationships of linear vessels
     Phaa=Vhaa/C(1);    Plna=Vlna/C(2);     Plca=Vlca/C(3);
@@ -211,12 +211,6 @@ else
     D9=Prv>Prpap;   D10=Prv>Plpap; 
     Dp=D9|D10;
     D11=Prpv>Pla; D12=Plpv>Pla;  
-    
-   if mPAP<=25
-       D0=Plv>Prv; % Left to right shunting 
-       else
-       D0=1; % Bidirectional shunting
-   end
 
     Q2=D1*Q3+D2*Q4+D3*Q5+D4*Q6; 
     Q7=D51*Q71+D52*Q72;  
@@ -229,7 +223,7 @@ else
   % Q(t+step)-Q(t)=step*I(t), I(t+step)-I(t)=step*U(t)/L,
     
     %% Recursive calculation 
-    Eright(1)=Dm*Q1-Da*Q2-D0*Q31; 
+    Eright(1)=Dm*Q1-Da*Q2-Q31; 
     Eright(2)=D1*Q3-D51*Q71-D52*Q72;
     Eright(3)=D2*Q4-Q8;
     Eright(4)=D3*Q5-Q9;
@@ -247,7 +241,7 @@ else
     Eright(16)=Q15-D8*Q20;
     Eright(17)=D53*Q16+D54*Q17+D6*Q18+D7*Q19+D8*Q20-Q21;
     Eright(18)=Q21-Dt*Q22;
-    Eright(19)=Dt*Q22+D0*Q31-Dp*Q23;
+    Eright(19)=Dt*Q22+Q31-Dp*Q23;
     Eright(20)=D9*Q240-Q24;
     Eright(21)=D10*Q250-Q25;
     Eright(22)=(Prpap-Q24*R(20)-Prpad)/L(2); 
