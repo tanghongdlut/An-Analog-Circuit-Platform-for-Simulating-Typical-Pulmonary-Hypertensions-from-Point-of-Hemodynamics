@@ -1,9 +1,9 @@
 % This script is a simulation program for pulmonary hypertension due to DPAS 
-%  based on an analog circuit platform.
-%  The circuit platform is shown in a document  "Figure_analog_circuit_platform.doc"
+% based on an analog circuit platform.
+% The circuit platform is shown in a document  "Figure_analog_circuit_platform.doc"
 % The simulation time is 700s. A cardiac cycle is 0.7845s (heart rate is about 76.5 beat per minute). 
 % The time step size in numerical solution is 0.0005s. 
-% The total blood volume in the circulation system is 5111.5 ml.
+% The total blood volume in the circulation system is 4711 ml.
 % The sympathetic frequencies and vagal frequency is set as 0.5. 
 % The initial blood volume of each capacitor, current of each inductor, initial values of capacitances, 
 % inductances and resistances in the model given in Appendix A. 
@@ -14,7 +14,7 @@
 % Corresponding author, Hong Tang, tanghong@dlut.edu.cn
 
 clear all
-tic
+tic  % to start a timer 
  
 %%  Load the initial values of resistances
 %   Rm     Ra   Rhaa  Rlna  Rlca  Raop  Rrula  Rrica  Rlica  Rlula  Rsap  Rrsv
@@ -25,8 +25,8 @@ R=[0.015  0.02   12    14    14   1.1    0.4    0.4    0.4    0.4    0.5   0.17 
 %% Load the initial values of compliances    
 % Chaa  Clna  Clca  Caop   Crula  Crica  Clica  Clula  Csap   Crsv    
 C=[1     1     1     0.8     3      2      4      2     5      10 ...
-   10     10     10   20    30    10     10     23     23     25   25 ];
-% Crijv  Clijv  Clsv  Csv   Cvc  Crpap  Clpap  Crpad  Clpad  Crpv  Clpv
+   10    10    10   20   30    10     10     23     23     25   25 ];
+% Crijv Clijv Clsv  Csv  Cvc  Crpap  Clpap  Crpad  Clpad  Crpv  Clpv
 
 %% Load the initial values of viscoelastic resistances
 %  Rchaa  Rclna  Rclca  Rcaop   Rcrpap  Rclpap  Rcrpad   Rclpad   Rrpv    Rlpv
@@ -47,8 +47,7 @@ L=[0.001  0.001  0.001 ];
 % Include heart chamber and vascular volume, and systemic and pulmonary aorta flow,
 
 load yinit_DPAS.mat     
-yinit=yinit6;    
-
+yinit=yinit_DPAS;    
 
 %% Adjustable part
 Tall=700;  % Simulation  duration, time in seconds
@@ -63,13 +62,10 @@ FhrS=0.5*ones(samNum+2,1); % Fhrs is normalized sympathetic frequency
 Fcon=0.5*ones(samNum+2,1); % Fcon is sympathetic efferent discharge frequency 
 Fvaso=0.5*ones(samNum+2,1);% Fvaso is normalized sympathetic efferent frequency
 
-
 %-------------%
 beatNum=1;  % Number of heartbeats
 HrT=zeros(1,2000);  % Time of each cardiac cycle
-num=1;  % Record the number of simulation steps
-numN=1;  
-
+num=1;  % Record the number of simulation steps 
 
 allP=zeros(samNum+1,25);  % All blood pressure values at each moment
 allV=zeros(samNum+1,25);  % All volume values at each moment
@@ -78,7 +74,7 @@ allQ=zeros(samNum+1,35);  % All blood flow values at each moment
 allC=zeros(samNum+1,2);   % [Rrpad   Rlpad];
 allR=zeros(samNum+1,2);   % [Crpad   Clpad];
 
-mPAP=zeros(893,1); % mean pressure of the proximal pulmonary artery
+mPAP=zeros(893,1); % Mean proximal right pulmonary artery pressure
 
 allVlv=zeros(samNum+1,1); allVrv=zeros(samNum+1,1);
 allVla=zeros(samNum+1,1); allVra=zeros(samNum+1,1);
@@ -116,49 +112,40 @@ for t=0:step:Tall
         Prv=mycallP_DPAS(Vrv,ttemp,Fcon(num),2,NN,beatNum-NN,mPAP); 
     end
  
-    
-    
-    
-
     %% P-V relationships of linear vessels
     Phaa=Vhaa/C(1);     Plna=Vlna/C(2);      Plca=Vlca/C(3);
     Paop=Vaop/C(4);     Prula=Vrula/C(5);    Prica=Vrica/C(6);
     Plica=Vlica/C(7);   Plula=Vlula/C(8);    Prsv=Vrsv/C(10);
     Prijv=Vrijv/C(11);  Plijv=Vlijv/C(12);   Plsv=Vlsv/C(13);   
     Prpv=Vrpv/C(20);     Plpv=Vlpv/C(21);
-    
-   
+       
     %% Nonlinear P-V relationship for proximal pulmonary arteries 
     Krpap_0=20;   Klpap_0=20; 
     Vm_rpap=100;  Vm_lpap=100;
     Prpap=-Krpap_0*log(1-(Vrpap/Vm_rpap));
     Plpap=-Klpap_0*log(1-(Vrpap/Vm_lpap));  
     
-    %% Nonlinear P-V relationship for distal pulmonary arteries due to decreasing radius
-    
-    % When the vascular radius is narrow ( the initial value of radius r is 1 , and the vascular radius after  stenosis is  0.4 ),
-    % 1/r changes from 1 to (1/4)=2.5, and  
-    %   r=(1+(39.0625/893)*beatNum)^(-1/4);   
-    %   r=1-0.6/893*beatNum;
- 
-   g_r=39.0625/893;
-   r=(1+g_r*beatNum)^(-1/4); 
+    %% Nonlinear P-V relation for distal pulmonary arteries due to stenosis
+    g_r=0.043743;
+    r=(1+g_r*beatNum)^(-1/4); 
     R(22)=((1/r)^4)*0.03;  %Rrpad
     R(23)=((1/r)^4)*0.03;  %Rlpad
     allR(num,:)=[R(22) R(23)];    
     
-    %%  Trc=R*C
-    Trc=0.69; 
+    %%  Trc(t)=R*C
+    Trc_0=0.69;  % Trc_0 is the initial values of  RC-time
+    trc=0.0008;  
+    Trc=Trc_0*exp(-trc*beatNum);  % RC-time decreases over time
+            
     C(18)=Trc/R(22);  % Crpad
     C(19)=Trc/R(23);  % Crpad
     allC(num,:)=[C(18) C(19)];
        
-    Prpad=Vrpad/C(18);  Plpad=Vlpad/C(19); 
+    Prpad=Vrpad/C(18);  
+    Plpad=Vlpad/C(19); 
     
-    
-  %% Nonlinear P-V relationships for specified vessels 
-
-  Kc=1000; Vsap_min=210; N0=50;
+   %% Nonlinear P-V relationships for specified vessels 
+   Kc=1000; Vsap_min=210; N0=50;
    Kp1=0.03; Kp2=0.2; Taop=0.1;
    Psap_a=Kc*log10((Vsap-Vsap_min)/N0+1);  
    Psap_p=Kp1*exp(Taop*(Vsap-Vsap_min))+Kp2*(Vsap-Vsap_min).^2; 
@@ -174,7 +161,7 @@ for t=0:step:Tall
         Pvc=N2+K2*exp(Vvc/Vvc_min);
     end
 
-        Kr=0.04; Vsap_max=250;
+    Kr=0.04; Vsap_max=250;
     R(11)=Kr*exp(4*Fvaso(num))+Kr*(Vsap_max/Vsap).^2;  % Rsap
     
     KR=0.001; Vvc_max=350; R0=0.025;
@@ -201,7 +188,7 @@ for t=0:step:Tall
     Q26=(Prpad-Prpv)/R(22);    Q27=(Plpad-Plpv)/R(23);
     Q28=(Prpv-Pla)/R(24);      Q29=(Plpv-Pla)/R(25);
   
-   %% Valves  model  (1: open; 0: close)
+    %% Valves  model  (1: open; 0: close)
     Dm=Pla>Plv;  
     D1=Plv>Phaa;  D2=Plv>Plna;
     D3=Plv>Plca;  D4=Plv>Paop;  
@@ -214,15 +201,14 @@ for t=0:step:Tall
     D9=Prv>Prpap;   D10=Prv>Plpap; 
     Dp=D9|D10;
     D11=Prpv>Pla; D12=Plpv>Pla;
-  
-    
+      
     Q2=D1*Q3+D2*Q4+D3*Q5+D4*Q6; 
     Q7=D51*Q71+D52*Q72;  
     Q77=D53*Q16+D54*Q17;
     Q23=D9*Q240+D10*Q250;
     Q30=D11*Q28+D12*Q29;
     
-   %% Solution of differential equations
+    %% Solution of differential equations
     % Convert differential equations into difference equations,
     % Q(t+step)-Q(t)=step*I(t), I(t+step)-I(t)=step*U(t)/L,
     
@@ -257,7 +243,6 @@ for t=0:step:Tall
     Eright(27)=Q27-D12*Q29;
     Eright(28)=D11*Q28+D12*Q29-Dm*Q1; 
    
-    
     allQ1(num)=Q2*Da;
     allQ2(num)=Q1*Dm;
     
@@ -280,8 +265,7 @@ for t=0:step:Tall
     Q250=Q250*D10;
     Q28=Q28*D11;
     Q29=Q29*D12;
-
-    
+ 
     allD(num,:)=[Da Dm Dp Dt D1 D2 D3 D4 D51 D52 D53 D54 D6 D7 D8 D9 D10 D11 D12];
     %             1  2  3  4  5  6  7  8   9  10  11 12 13  14  15  16  17  18  19  20  21  22  23  24  25  26   27   28  29  30  31  32  33  34  35
     allQ(num,:)=[Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q71 Q72 Q77 Q8 Q9 Q10 Q11 Q12 Q13 Q14 Q15 Q16 Q17 Q18 Q19 Q20 Q21 Q22 Q23 Q240 Q250 Q24 Q25 Q26 Q27 Q28 Q29 Q30];
@@ -299,13 +283,11 @@ for t=0:step:Tall
         LVSV(beatNum-1,1)=max(allV(num-floor(HrT(beatNum-1)/step):num-1,1))-min(allV(num-floor(HrT(beatNum-1)/step):num-1,1));
        %% Right ventricular stroke volume
         RVSV(beatNum-1,1)=max(allV(num-floor(HrT(beatNum-1)/step):num-1,18))-min(allV(num-floor(HrT(beatNum-1)/step):num-1,18));
-    
-        
-        %% Calculate the mean pressure of the right proximal pulmonary artery
-        % mPAP=1/3sPAP+2/3dPAP
-        sPAP(beatNum-1,1)=max(allP(num-floor(HrT(beatNum-1)/step):num-1,19)); % Systolic blood pressure of the proximal pulmonary artery
-        dPAP(beatNum-1,1)=min(allP(num-floor(HrT(beatNum-1)/step):num-1,19)); % Diastolic blood pressure of the proximal pulmonary artery
-        mPAP(beatNum-1,1)=(1/3)*sPAP(beatNum-1,1)+(2/3)*dPAP(beatNum-1,1);
+            
+       %% Calculate the mean proximal right pulmonary artery pressure (mPAP=1/3sPAP+2/3dPAP)
+        sPAP(beatNum-1,1)=max(allP(num-floor(HrT(beatNum-1)/step):num-1,19)); % Systolic blood pressure of the proximal right pulmonary artery
+        dPAP(beatNum-1,1)=min(allP(num-floor(HrT(beatNum-1)/step):num-1,19)); % Diastolic blood pressure of the proximal right pulmonary artery
+        mPAP(beatNum-1,1)=(1/3)*sPAP(beatNum-1,1)+(2/3)*dPAP(beatNum-1,1); % Mean proximal right pulmonary artery pressure
 
     end  
        
@@ -316,7 +298,6 @@ end
 
 toc 
 HrT=HrT(find(HrT~=0));
-
 HrT=[HrT ttemp];
 
 Plv=allP(:,1);     Phaa=allP(:,2);     Plna=allP(:,3);     Plca=allP(:,4); 
@@ -332,7 +313,6 @@ if length(t)<length(Plv)
    t=[t; t(end)+step]; 
 end
  
-
 %% Changes in total blood volume during the simulation
 i=1;
 for i = 1:size(allV,1)

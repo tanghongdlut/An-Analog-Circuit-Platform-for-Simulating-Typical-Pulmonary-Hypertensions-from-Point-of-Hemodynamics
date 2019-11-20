@@ -1,10 +1,10 @@
 % This script is a simulation program for the normal human circulation system 
-%  based on an analog circuit platform.
-%  The circuit platform is shown in a document  "Figure_analog_circuit_platform.doc"
+% based on an analog circuit platform.
+% The circuit platform is shown in a document  "Figure_analog_circuit_platform.doc"
 
 % The simulation time is 700s. A cardiac cycle is 0.7845s (heart rate is about 76.5 beat per minute). 
 % The time step size in numerical solution is 0.0005s. 
-% The total blood volume in the circulation system is 5111.5 ml.
+% The total blood volume in the circulation system is 4711 ml.
 % The sympathetic frequencies and vagal frequency is set as 0.5. 
 % The initial blood volume of each capacitor, current of each inductor, initial values of capacitances, 
 % inductances and resistances in the model given in Appendix A. 
@@ -48,7 +48,7 @@ L=[0.001  0.001  0.001 ];
 % Include heart chambers and vascular volumes, and systemic and pulmonary aorta flows,
 
 load yinit_normal.mat       
-yinit=yinit6;     
+yinit=yinit_normal;     
 
 %% Adjustable part             
 
@@ -67,7 +67,6 @@ Fvaso=0.5*ones(samNum+2,1);% Fvaso is normalized sympathetic efferent frequency
 %-------------%
 beatNum=1;   % Number of heartbeats
 HrT=zeros(1,2000);  % Time of each cardiac cycle
-
 num=1;  % Record the number of simulation steps
 
 allP=zeros(samNum+1,25);  % All blood pressure values at each moment
@@ -119,7 +118,7 @@ for t=0:step:Tall
    Kv=40; Vsv_max=3500;
    Psv=-Kv*log10((Vsv_max/Vsv) -0.99); % Systemic veins
 
-    N1=0; N2=-5; K1=0.15; K2=0.4; Vvc_min=50; Vvc_0=130;  
+   N1=0; N2=-5; K1=0.15; K2=0.4; Vvc_min=50; Vvc_0=130;  
     if  Vvc>=130   % Vena cava
         Pvc=N1+K1*(Vvc-Vvc_0);
     else
@@ -128,8 +127,7 @@ for t=0:step:Tall
        
     allP(num,:)=[Plv Phaa Plna Plca Paop Prula Prica Plica Plula Psap Prsv Prijv Plijv Plsv Psv Pvc Pra Prv Prpap Plpap Prpad Plpad Prpv Plpv Pla];
     allV(num,:)=[Vlv Vhaa Vlna Vlca Vaop Vrula Vrica Vlica Vlula Vsap Vrsv Vrijv Vlijv Vlsv Vsv Vvc Vra Vrv Vrpap Vlpap Vrpad Vlpad Vrpv Vlpv Vla];
-  
-    
+      
     Kr=0.04; Vsap_max=250;
     R(11)=Kr*exp(4*Fvaso(num))+Kr*(Vsap_max/Vsap).^2;  % Rsap
     
@@ -168,14 +166,13 @@ for t=0:step:Tall
     Dp=D9|D10;
     D11=Prpv>Pla; D12=Plpv>Pla;
   
-    
     Q2=D1*Q3+D2*Q4+D3*Q5+D4*Q6; 
     Q7=D51*Q71+D52*Q72;  
     Q77=D53*Q16+D54*Q17;
     Q23=D9*Q240+D10*Q250;
     Q30=D11*Q28+D12*Q29;
     
-  %% Solution of differential equations
+   %% Solution of differential equations
    % Convert differential equations into difference equations,
    % V(t+step)-V(t)=step*Q(t), Q(t+step)-Q(t)=step*P(t)/L,
     
@@ -209,8 +206,7 @@ for t=0:step:Tall
     Eright(26)=Q26-D11*Q28;
     Eright(27)=Q27-D12*Q29;
     Eright(28)=D11*Q28+D12*Q29-Dm*Q1; 
-   
-    
+      
     allQ1(num)=Q2*Da;
     allQ2(num)=Q1*Dm;
     
@@ -234,7 +230,6 @@ for t=0:step:Tall
     Q28=Q28*D11;
     Q29=Q29*D12;
 
-    
     allD(num,:)=[Da Dm Dp Dt D1 D2 D3 D4 D51 D52 D53 D54 D6 D7 D8 D9 D10 D11 D12];
     allQ(num,:)=[Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q71 Q72 Q77 Q8 Q9 Q10 Q11 Q12 Q13 Q14 Q15 Q16 Q17 Q18 Q19 Q20 Q21 Q22 Q23 Q240 Q250 Q24 Q25 Q26 Q27 Q28 Q29 Q30];
 
@@ -247,16 +242,15 @@ for t=0:step:Tall
         beatNum=beatNum+1;
         HrT(beatNum-1)=ttemp;
 
-        %% Left ventricular stroke volume
+       %% Left ventricular stroke volume
         LVSV(beatNum-1,1)=max(allV(num-floor(HrT(beatNum-1)/step):num-1,1))-min(allV(num-floor(HrT(beatNum-1)/step):num-1,1));
-        %% Right ventricular stroke volume
+       %% Right ventricular stroke volume
         RVSV(beatNum-1,1)=max(allV(num-floor(HrT(beatNum-1)/step):num-1,18))-min(allV(num-floor(HrT(beatNum-1)/step):num-1,18));
         
-        % Calculate the mean pressure of the proximal pulmonary artery
-        % mPAP=1/3sPAP+2/3dPAP
-        sPAP(beatNum-1,1)=max(allP(num-floor(HrT(beatNum-1)/step):num-1,19)); % Systolic  blood pressure of the proximal pulmonary artery
-        dPAP(beatNum-1,1)=min(allP(num-floor(HrT(beatNum-1)/step):num-1,19)); % Diastolic blood pressure of the proximal pulmonary artery
-        mPAP(beatNum-1,1)=(1/3)*sPAP(beatNum-1,1)+(2/3)*dPAP(beatNum-1,1);
+       %% Calculate the mean proximal right pulmonary artery pressure (mPAP=1/3sPAP+2/3dPAP)
+        sPAP(beatNum-1,1)=max(allP(num-floor(HrT(beatNum-1)/step):num-1,19)); % Systolic blood pressure of the proximal right pulmonary artery 
+        dPAP(beatNum-1,1)=min(allP(num-floor(HrT(beatNum-1)/step):num-1,19)); % Diastolic blood pressure of the proximal right pulmonary artery
+        mPAP(beatNum-1,1)=(1/3)*sPAP(beatNum-1,1)+(2/3)*dPAP(beatNum-1,1); % Mean proximal right pulmonary artery pressure
   
     end  
     

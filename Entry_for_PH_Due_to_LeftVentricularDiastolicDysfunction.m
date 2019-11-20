@@ -1,9 +1,9 @@
 % This script is a simulation program for pulmonary hypertension due to left ventricular distolic disfunction 
-%  based on an analog circuit platform.
-%  The circuit platform is shown in a document  "Figure_analog_circuit_platform.doc"
+% based on an analog circuit platform.
+% The circuit platform is shown in a document  "Figure_analog_circuit_platform.doc"
 % The simulation time is 700s. A cardiac cycle is 0.7845s (heart rate is about 76.5 beat per minute). 
 % The time step size in numerical solution is 0.0005s. 
-% The total blood volume in the circulation system is 5111.5 ml.
+% The total blood volume in the circulation system is 4711 ml.
 % The sympathetic frequencies and vagal frequency is set as 0.5. 
 % The initial blood volume of each capacitor, current of each inductor, initial values of capacitances, 
 % inductances and resistances in the model given in Appendix A. 
@@ -12,7 +12,6 @@
 
 % Written by: Ziyin Dai, May 27, 2019, daiziyin@mail.dlut.edu.cn
 % Corresponding author, Hong Tang, tanghong@dlut.edu.cn
-
 
 clear all
 tic
@@ -48,10 +47,9 @@ L=[0.001  0.001  0.001 ];
 % Include heart chamber and vascular volume, and systemic and pulmonary aorta flow,
 
 load yinit_LVDD.mat  
-yinit=yinit6;    
+yinit=yinit_LVDD;    
 
 %% Adjustable part
-
 Tall=700;    % Simulation  duration, time in seconds
 step=0.0005; % Simulation step size, time in seconds
 fs=1/step;   % Frequency
@@ -73,9 +71,8 @@ allP=zeros(samNum+1,25);  % All blood pressure values at each moment
 allV=zeros(samNum+1,25);  % All volume values at each moment
 allD=zeros(samNum+1,19);  % Valve status at each moment (1: open; 0: close)
 allQ=zeros(samNum+1,35);  % All blood flow values at each moment
-allR=zeros(samNum+1,2);   %[Rsap Rvc]
-
- mPAP=zeros(893,1); % mean pressure of the proximal pulmonary artery
+allR=zeros(samNum+1,6);   %[Rrpap Rlpap Rrpad Rlpad Rrpv Rlpv]
+allC=zeros(samNum+1,6);   %[Crpap Clpap Crpad Clpad Crpv Clpv]
 
 allVlv=zeros(samNum+1,1); allVrv=zeros(samNum+1,1);
 allVla=zeros(samNum+1,1); allVra=zeros(samNum+1,1);
@@ -99,21 +96,14 @@ for t=0:step:Tall
     allVlv(num)=Vlv; allVla(num)=Vla;
     allVrv(num)=Vrv; allVra(num)=Vra;
  
-   %% The P-V relationship of four heart chambers
+    %% The P-V relationship of four heart chambers
     ttemp=t-sum(HrT(1:beatNum)); % At the current moment of a new cardiac cycle
-    % beatNumN=892;
     beatNumN=beatNum;
-
-%     Plv=mycalPlv(Vlv,ttemp,Fcon(num),beatNumN); % Left ventricle
-%     Pla=mycalPla(Vla,ttemp,Fcon(num),beatNumN); % Left atrium
-%     Prv=mycalPrv(Vrv,ttemp,Fcon(num),beatNumN); % Right ventricle
-%     Pra=mycalPra(Vra,ttemp,Fcon(num));          % Right atrium      
- 
     Plv=mycallP_LVDD(Vlv,ttemp,Fcon(num),1,beatNumN); % Left ventricle
     Pla=mycallP_LVDD(Vla,ttemp,Fcon(num),3,beatNumN); % Left atrium
     Prv=mycallP_LVDD(Vrv,ttemp,Fcon(num),2,beatNumN); % Right ventricle
-    Pra=mycallP_LVDD(Vra,ttemp,Fcon(num),4,0);          % Right atrium      
-    
+    Pra=mycallP_LVDD(Vra,ttemp,Fcon(num),4,0);        % Right atrium      
+        
     %% P-V relationships of linear vessels
     Phaa=Vhaa/C(1);    Plna=Vlna/C(2);      Plca=Vlca/C(3);
     Paop=Vaop/C(4);    Prula=Vrula/C(5);    Prica=Vrica/C(6);
@@ -130,7 +120,7 @@ for t=0:step:Tall
 
     k5=0.035;   
     k6=0.035;
-    k7=0.035; 
+    k7=0.005; 
     Prpap=-(Krpap_0+k5*beatNumN)*log(1-(Vrpap/Vm_rpap));
     Plpap=-(Klpap_0+k5*beatNumN)*log(1-(Vrpap/Vm_lpap));
     Prpad=-(Krpad_0+k6*beatNumN)*log(1-(Vrpad/Vm_rpad));
@@ -148,12 +138,12 @@ for t=0:step:Tall
    Kv=40; Vsv_max=3500;
    Psv=-Kv*log10((Vsv_max/Vsv) -0.99); % Systemic veins
 
-    N1=0; N2=-5; K1=0.15; K2=0.4; Vvc_min=50; Vvc_0=130;  
-    if  Vvc>=130   % Vena cava
-        Pvc=N1+K1*(Vvc-Vvc_0);
-    else
-        Pvc=N2+K2*exp(Vvc/Vvc_min);
-    end
+   N1=0; N2=-5; K1=0.15; K2=0.4; Vvc_min=50; Vvc_0=130;  
+   if  Vvc>=130   % Vena cava
+       Pvc=N1+K1*(Vvc-Vvc_0);
+   else
+       Pvc=N2+K2*exp(Vvc/Vvc_min);
+   end
   
     Kr=0.04; Vsap_max=250;
     R(11)=Kr*exp(4*Fvaso(num))+Kr*(Vsap_max/Vsap).^2;  % Rsap
@@ -162,26 +152,62 @@ for t=0:step:Tall
     R(17)=KR*(Vvc_max/Vvc).^2+R0;  % Rvc
      
     %%  Model of Pulmonary Vascular Resistance
-    beatNum_mPAP=569; % beatNum_mPAP is the time point when mPAP>=25mmHg
-    k8=0.0002;
-   if beatNum>beatNum_mPAP
-       R(20)=0.02+k8*(beatNumN-beatNum_mPAP+1);
-       R(21)=0.02+k8*(beatNumN-beatNum_mPAP+1);
-       R(22)=0.03+k8*(beatNumN-beatNum_mPAP+1);
-       R(23)=0.03+k8*(beatNumN-beatNum_mPAP+1);
-       R(24)=0.045+k8*(beatNumN-beatNum_mPAP+1);
-       R(25)=0.045+k8*(beatNumN-beatNum_mPAP+1);
-       allR(num,1)=[R(20)];
-   else
-      R(20)=0.02;
-      R(21)=0.02;
-      R(22)=0.03;
-      R(23)=0.03;
-      R(24)=0.045;
-      R(25)=0.045;
-      allR(num,1)=[R(20)];
-end
-    
+ if beatNum>1
+    % The vascular compliance decreases with increasing mean pressure.
+    % C(P)=g_c*exp(-h_c*P)   
+       g_cpl=14; h_cpl=0.039;       
+       C(16)=g_cpl*exp(-h_cpl*mPAP_rpap(beatNum-1,:)); 
+       C(17)=g_cpl*exp(-h_cpl*mPAP_lpap(beatNum-1,:));
+       g_cdl=20; h_cdl=0.035; 
+       C(18)=g_cdl*exp(-h_cdl*mPAP_rpad(beatNum-1,:));
+       C(19)=g_cdl*exp(-h_cdl*mPAP_lpad(beatNum-1,:));
+       g_cvl=25; h_cvl=0.03; 
+       C(20)=g_cvl*exp(-h_cvl*mPAP_rpv(beatNum-1,:));
+       C(21)=g_cvl*exp(-h_cvl*mPAP_lpv(beatNum-1,:));
+       allC(num,:)=[C(16) C(17) C(18) C(19) C(20) C(21)]; 
+       
+       %%  Trc(t)=R*C
+       Trpap_0=0.2; % Trpap_0 is the initial values of  RC-time in proximal right pulmonary artery
+       trpap_l=0.00012;
+       Tlpap_0=0.2; % Tlpap_0 is the initial values of  RC-time in proximal left pulmonary artery
+       tlpap_l=0.00012;       
+       
+       Trpad_0=0.45; % Trpad_0 is the initial values of  RC-time in distal right pulmonary artery
+       trpad_l=0.0001;
+       Tlpad_0=0.45; % Tlpad_0 is the initial values of  RC-time in distal left pulmonary artery
+       tlpad_l=0.0001;       
+       
+       Trpv_0=0.85; % Trpv_0 is the initial values of  RC-time in right pulmonary vein 
+       trpv_l=0.00009;
+       Tlpv_0=0.85; % Tlpv_0 is the initial values of  RC-time in left pulmonary vein 
+       tlpv_l=0.00009;      
+       
+       Trpap=Trpap_0*exp(-trpap_l*beatNum); % RC-time decreases over time in proximal right pulmonary artery
+       Tlpap=Tlpap_0*exp(-tlpap_l*beatNum); % RC-time decreases over time in proximal left pulmonary artery
+            
+       Trpad=Trpad_0*exp(-trpad_l*beatNum); % RC-time decreases over time in distal right pulmonary artery
+       Tlpad=Tlpad_0*exp(-tlpad_l*beatNum); % RC-time decreases over time in distal left pulmonary artery
+            
+       Trpv=Trpv_0*exp(-trpv_l*beatNum); % RC-time decreases over time in right pulmonary vein          
+       Tlpv=Tlpv_0*exp(-tlpv_l*beatNum); % RC-time decreases over time in left pulmonary vein          
+                  
+       R(20)=Trpap/C(16); %Rrpap
+       R(21)=Tlpap/C(17); %Rlpap
+       R(22)=Trpad/C(18); %Rrpad
+       R(23)=Tlpad/C(19); %Rlpad
+       R(24)=Trpv/C(20); %Rrpv
+       R(25)=Tlpv/C(21); %Rlpv
+       allR(num,:)=[R(20) R(21) R(22) R(23) R(24) R(25)];  
+ else
+       R(20)=0.02;
+       R(21)=0.02;
+       R(22)=0.03;
+       R(23)=0.03;
+       R(24)=0.045;
+       R(25)=0.045;
+       allR(num,:)=[R(20) R(21) R(22) R(23) R(24) R(25)];  
+ end
+
      allP(num,:)=[Plv Phaa Plna Plca Paop Prula Prica Plica Plula Psap Prsv Prijv Plijv Plsv Psv Pvc Pra Prv Prpap Plpap Prpad Plpad Prpv Plpv Pla];
      allV(num,:)=[Vlv Vhaa Vlna Vlca Vaop Vrula Vrica Vlica Vlula Vsap Vrsv Vrijv Vlijv Vlsv Vsv Vvc Vra Vrv Vrpap Vlpap Vrpad Vlpad Vrpv Vlpv Vla];
 
@@ -284,7 +310,7 @@ end
 
     allD(num,:)=[Da Dm Dp Dt D1 D2 D3 D4 D51 D52 D53 D54 D6 D7 D8 D9 D10 D11 D12];
     allQ(num,:)=[Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q71 Q72 Q77 Q8 Q9 Q10 Q11 Q12 Q13 Q14 Q15 Q16 Q17 Q18 Q19 Q20 Q21 Q22 Q23 Q240 Q250 Q24 Q25 Q26 Q27 Q28 Q29 Q30];
-
+%                                                                                                            26  27   28  29  30   31  32  33  34  35
     yinit=yinit+step*Eright;
     num=num+1;
  
@@ -298,13 +324,37 @@ end
         LVSV(beatNum-1,1)=max(allV(num-floor(HrT(beatNum-1)/step):num-1,1))-min(allV(num-floor(HrT(beatNum-1)/step):num-1,1));
        %% Right ventricular stroke volume
         RVSV(beatNum-1,1)=max(allV(num-floor(HrT(beatNum-1)/step):num-1,18))-min(allV(num-floor(HrT(beatNum-1)/step):num-1,18));
+      
+       %% Calculate the mean proximal right pulmonary artery pressure
+        sPAP_rpap(beatNum-1,1)=max(allP(num-floor(HrT(beatNum-1)/step):num-1,19)); % Systolic blood pressure of the proximal right pulmonary artery
+        dPAP_rpap(beatNum-1,1)=min(allP(num-floor(HrT(beatNum-1)/step):num-1,19)); % Diastolic blood pressure of the proximal right pulmonary artery
+        mPAP_rpap(beatNum-1,1)=(1/3)*sPAP_rpap(beatNum-1,1)+(2/3)*dPAP_rpap(beatNum-1,1); % Mean proximal right pulmonary artery pressure
         
-        %% Calculate the mean pressure of the proximal pulmonary artery
-         % mPAP=1/3sPAP+2/3dPAP
-        sPAP(beatNum-1,1)=max(allP(num-floor(HrT(beatNum-1)/step):num-1,19)); % Systolic and  blood pressure of the proximal pulmonary artery
-        dPAP(beatNum-1,1)=min(allP(num-floor(HrT(beatNum-1)/step):num-1,19)); % Diastolic blood pressure of the proximal pulmonary artery
-        mPAP(beatNum-1,1)=(1/3)*sPAP(beatNum-1,1)+(2/3)*dPAP(beatNum-1,1);
-               
+        %% Calculate the mean proximal left pulmonary artery pressure
+        sPAP_lpap(beatNum-1,1)=max(allP(num-floor(HrT(beatNum-1)/step):num-1,20)); % Systolic blood pressure of the proximal left pulmonary artery
+        dPAP_lpap(beatNum-1,1)=min(allP(num-floor(HrT(beatNum-1)/step):num-1,20)); % Diastolic blood pressure of the proximal left pulmonary artery
+        mPAP_lpap(beatNum-1,1)=(1/3)*sPAP_lpap(beatNum-1,1)+(2/3)*dPAP_lpap(beatNum-1,1);  % Mean proximal left pulmonary artery pressure      
+
+        %% Calculate the mean distal right pulmonary artery pressure
+        sPAP_rpad(beatNum-1,1)=max(allP(num-floor(HrT(beatNum-1)/step):num-1,21)); % Systolic blood pressure of the distal right pulmonary artery
+        dPAP_rpad(beatNum-1,1)=min(allP(num-floor(HrT(beatNum-1)/step):num-1,21)); % Diastolic blood pressure of the distal right pulmonary artery
+        mPAP_rpad(beatNum-1,1)=(1/3)*sPAP_rpad(beatNum-1,1)+(2/3)*dPAP_rpad(beatNum-1,1); % Mean distal right pulmonary artery pressure
+       
+        %% Calculate the mean distal left pulmonary artery pressure
+        sPAP_lpad(beatNum-1,1)=max(allP(num-floor(HrT(beatNum-1)/step):num-1,22)); % Systolic blood pressure of the distal left pulmonary artery
+        dPAP_lpad(beatNum-1,1)=min(allP(num-floor(HrT(beatNum-1)/step):num-1,22)); % Diastolic blood pressure of the distal left pulmonary artery
+        mPAP_lpad(beatNum-1,1)=(1/3)*sPAP_lpad(beatNum-1,1)+(2/3)*dPAP_lpad(beatNum-1,1); % Mean distal left pulmonary artery pressure        
+        
+        %% Calculate the mean right pulmonary venous pressure
+        sPAP_rpv(beatNum-1,1)=max(allP(num-floor(HrT(beatNum-1)/step):num-1,23)); % Systolic blood pressure of the right pulmonary venous pressure
+        dPAP_rpv(beatNum-1,1)=min(allP(num-floor(HrT(beatNum-1)/step):num-1,23)); % Diastolic blood pressure of the right pulmonary venous pressure
+        mPAP_rpv(beatNum-1,1)=(1/3)*sPAP_rpv(beatNum-1,1)+(2/3)*dPAP_rpv(beatNum-1,1); % Mean right pulmonary venous pressure
+        
+        %% Calculate the mean left pulmonary venous pressure
+        sPAP_lpv(beatNum-1,1)=max(allP(num-floor(HrT(beatNum-1)/step):num-1,24)); % Systolic blood pressure of the left pulmonary venous pressure
+        dPAP_lpv(beatNum-1,1)=min(allP(num-floor(HrT(beatNum-1)/step):num-1,24)); % Diastolic blood pressure of the left pulmonary venous pressure
+        mPAP_lpv(beatNum-1,1)=(1/3)*sPAP_lpv(beatNum-1,1)+(2/3)*dPAP_lpv(beatNum-1,1); % Mean left pulmonary venous pressure       
+                
     end  
     
     %% Heart rate control

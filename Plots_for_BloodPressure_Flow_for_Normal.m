@@ -1,12 +1,12 @@
 % Firstly, run the entry codes "Entry_for_NormalHumanCirculationSystem.m"
 % Then, plot the curves of blood pressure and flow with respect to time
-% 
+
 % Written by: Ziyin Dai, May 27, 2019, daiziyin@mail.dlut.edu.cn
 % Corresponding author, Hong Tang, tanghong@dlut.edu.cn
 
 figure('unit','inch','position',[0.4 1 8 5])
 
-% Systemic blood pressures; 
+%% Systemic blood pressures; 
 v4=450/step-1069:450/step+2069;  
 hold on
 subplot(2,2,1),hold on
@@ -23,7 +23,7 @@ set(legend,'Orientation','horizontal');
 axis([0 1.569 0 130])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
-% Systemic blood flows 
+%% Systemic blood flows 
 v4=450/step-1069:450/step+2069;  
 hold on
 subplot(2,2,2),hold on
@@ -40,7 +40,7 @@ set(legend,'Orientation','horizontal');
 axis([0 1.569 0 900])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
-% Pulmonary blood pressures
+%% Pulmonary blood pressures
 v4=450/step-1069:450/step+2069;  
 hold on
 subplot(2,2,3),hold on
@@ -57,7 +57,7 @@ set(legend,'Orientation','horizontal');
 axis([0 1.569 0 20])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
-% pulmonary blood flows
+%% pulmonary blood flows
 v4=450/step-1069:450/step+2069;  
 hold on
 subplot(2,2,4),hold on
@@ -73,5 +73,3 @@ legend('\itI\rm_r_v','\itI\rm_r_a','\itI\rm_l_p_a_p','\itI\rm_l_p_v')
 set(legend,'Orientation','horizontal');
 axis([0 1.569 0 1100])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
-
-

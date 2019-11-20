@@ -1,12 +1,11 @@
 % Firstly, run the entry codes "Entry_for_PH_Due_to_LeftVentricularDiastolicDysfunction.m"
-% Then, plot the curves of pressure-volume loops for the four heart
-% chambers
-% 
+% Then, plot the curves of pressure-volume loops for the four heart chambers
+
 % Written by: Ziyin Dai, May 27, 2019, daiziyin@mail.dlut.edu.cn
 % Corresponding author, Hong Tang, tanghong@dlut.edu.cn
-%
 
 figure('unit','inch','position',[0.4 1 8 4])
+
 %% P-V loop of left ventricle
 v1=15/step+200:15/step+1800;  
 subplot(2,2,1),hold on

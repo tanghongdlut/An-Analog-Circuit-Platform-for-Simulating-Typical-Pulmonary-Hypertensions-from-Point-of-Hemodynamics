@@ -1,12 +1,14 @@
 % function P=mycallP(Vx,t,Fcon,cham,BN1,BN2,mPAP)
 % This function calculates the blood pressure of four chambers
+
 %% Inputs:
 % Vx is volumle of four chambers
 % t is time 
 % Fcon is sympathetic efferent discharge frequency
 % BN1 is the number of cardiac cycles when mPAP<50mmHg
 % BN2 is the number of cardiac cycles when mPAP>=50mmHg
-% mPAP is the mean pressure of the right proximal pulmonary artery
+% mPAP is the mean proximal right pulmonary artery pressure
+
 %% Outputs: 
 % The output is blood pressure
 % cham==1, The blood pressure of left ventricle
@@ -24,13 +26,11 @@ V0=[25         25          20        20     ];
 Vd=[40         40          20        20     ];
 lamda=[0.015   0.015     0.025       0.025  ];
 
-
-
 % The values of parameters in  activation function of four chambers
-%||---------------ventricle----------------||---atrium---||
-Ai=[0.3      0.35      0.5         0.55         0.9   ];
-Bi=[0.045    0.035     0.037       0.036        0.038 ];
-Ci=[0.175    0.23      0.275       0.3          0.025 ]+0.1;
+%||---------------ventricle------------||---atrium---||
+Ai=[0.3      0.35      0.5        0.55       0.9   ];
+Bi=[0.045    0.035     0.037      0.036      0.038 ];
+Ci=[0.175    0.23      0.275      0.3        0.025 ]+0.1;
 
 %% Modify the relative time parameters of atriums and ventricles
 if cham==1  %---LV
@@ -44,7 +44,7 @@ elseif cham==4 %---RA
 end
 
 %% The paratemers of Neuromodulation
-amin=0;bmin=0.7;Ka=3;Kb=0.5;
+amin=-2;bmin=0.7;Ka=7;Kb=0.5;
 a=amin+Ka*Fcon;
 b=bmin+Kb*Fcon;
 

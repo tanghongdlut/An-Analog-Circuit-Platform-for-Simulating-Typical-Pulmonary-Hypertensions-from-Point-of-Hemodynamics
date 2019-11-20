@@ -1,11 +1,8 @@
 % Firstly, run the entry codes "Entry_for_PH_Due_to_DPAS.m"
-% Then, plot the curves of pressure-volume loops for the four heart
-% chambers
-% 
+% Then, plot the curves of pressure-volume loops for the four heart chambers
+
 % Written by: Ziyin Dai, May 27, 2019, daiziyin@mail.dlut.edu.cn
 % Corresponding author, Hong Tang, tanghong@dlut.edu.cn
-%
-
 
 figure('unit','inch','position',[0.4 1 8 4])
 

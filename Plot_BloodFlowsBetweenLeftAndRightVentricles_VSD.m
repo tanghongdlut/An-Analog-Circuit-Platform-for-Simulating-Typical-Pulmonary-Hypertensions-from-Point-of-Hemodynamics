@@ -1,10 +1,10 @@
 % Firstly, run the entry codes "Entry_for_PH_Due_to_VentriculaSeptalDefect.m"
 % Then, plot the blood flow between ventricles
-% 
+
 % Written by: Ziyin Dai, May 27, 2019, daiziyin@mail.dlut.edu.cn
 % Corresponding author, Hong Tang, tanghong@dlut.edu.cn
 
-Tall=0.7845;
+Tall=0.7845; %The time of a cardiac cycle
 step=0.0005; 
 fs=1/step; 
 samNum=ceil(Tall/step); 
@@ -65,8 +65,8 @@ t=0:step:Tall*5;
  
 %   v4=1:1569;
 %   v4=1569+1:1569*2;
-%    v4=2*1569+1:1569*3;
-%     v4=3*1569+1:1569*4;
+%   v4=2*1569+1:1569*3;
+%   v4=3*1569+1:1569*4;
    v4=4*1569+1:1569*5;
 hold on
 plot(t(v4)-t(v4(1)),Qlv(v4),'b-','linewidth',1.5) 
@@ -79,8 +79,8 @@ grid on
 box on;
 ylabel('BF in ml/s','fontsize',10)
 xlabel(' Time in seconds','fontsize',10)
-%  legend('\itQ\rm_l_v','\itQ\rm_l_a','\itQ\rm_r_v','\itQ\rm_r_a','\itQ\rm_l_t_o_r')
+% legend('\itQ\rm_l_v','\itQ\rm_l_a','\itQ\rm_r_v','\itQ\rm_r_a','\itQ\rm_l_t_o_r')
 set(legend,'Orientation','horizontal');
 axis([0  0.7845 -100 2000])
- axis off
+axis off
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
