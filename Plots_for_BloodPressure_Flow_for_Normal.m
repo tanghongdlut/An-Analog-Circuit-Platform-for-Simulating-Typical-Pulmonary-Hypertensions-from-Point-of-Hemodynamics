@@ -14,13 +14,14 @@ plot(t(v4)-t(v4(1)),Plv(v4),'k-','linewidth',1.5)
 plot(t(v4)-t(v4(1)),Paop(v4),'k-.','linewidth',1.5) 
 plot(t(v4)-t(v4(1)),Pvc(v4),'k--','linewidth',1.5) 
 plot(t(v4)-t(v4(1)),Pla(v4),'b-','linewidth',1.5)
+
 grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel(' (a) Time in seconds','fontsize',10)
 legend('\itP\rm_l_v','\itP\rm_a_o_p','\itP\rm_v_c','\itP\rm_l_a')
 set(legend,'Orientation','horizontal');
-axis([0 1.569 0 130])
+axis([0 1.569 0 160])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 %% Systemic blood flows 
@@ -37,7 +38,7 @@ ylabel('Blood Flow in ml/s','fontsize',10)
 xlabel(' (b) Time in seconds','fontsize',10)
 legend('\itI\rm_l_v','\itI\rm_a_o_p','\itI\rm_v_c','\itI\rm_l_a')
 set(legend,'Orientation','horizontal');
-axis([0 1.569 0 900])
+axis([0 1.569 0 1500])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 %% Pulmonary blood pressures
@@ -54,7 +55,7 @@ ylabel('BP in mmHg','fontsize',10)
 xlabel(' (c)  Time in seconds','fontsize',10)
 legend('\itP\rm_r_v','\itP\rm_r_a','\itP\rm_l_p_a_p','\itP\rm_l_p_v')
 set(legend,'Orientation','horizontal');
-axis([0 1.569 0 20])
+axis([0 1.569 0 35])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 %% pulmonary blood flows

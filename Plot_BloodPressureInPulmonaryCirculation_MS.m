@@ -1,4 +1,4 @@
-% Firstly, run the entry codes "Entry_for_PH_Due_to_MitralStenosis.m"
+ % Firstly, run the entry codes "Entry_for_PH_Due_to_MitralStenosis.m"
 % Then, plot the curves of pressure over time
 
 % Written by: Ziyin Dai, May 27, 2019, daiziyin@mail.dlut.edu.cn
@@ -63,11 +63,11 @@ end
 figure('unit','inch','position',[0.4 1 1.6 2])
 t=0:step:Tall*5;
  
-%    v4=1:1569;
-%    v4=1569+1:1569*2;
-%    v4=2*1569+1:1569*3;
-%    v4=3*1569+1:1569*4;
-     v4=4*1569+1:1569*5;
+%         v4=1:1569;
+%         v4=1569+1:1569*2;
+%         v4=2*1569+1:1569*3;
+%         v4=3*1569+1:1569*4;
+          v4=4*1569+1:1569*5;
 hold on
 plot(t(v4)-t(v4(1)),Plpap(v4),'b-','linewidth',1.5) 
 plot(t(v4)-t(v4(1)),Plpad(v4),'r-','linewidth',1.5)
@@ -81,6 +81,6 @@ ylabel('BP in mmHg','fontsize',10)
 xlabel(' Time in seconds','fontsize',10)
 % legend('\itP\rm_l_p_a_p','\itP\rm_l_p_a_d','\itP\rm_l_p_v','\itP\rm_r_v','\itP\rm_l_a')
 set(legend,'Orientation','horizontal');
-axis([0  0.7845 0 80])
+axis([0  0.7845 0 100])
 axis off
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)

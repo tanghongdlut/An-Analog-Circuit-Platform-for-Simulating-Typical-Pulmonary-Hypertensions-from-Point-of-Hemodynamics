@@ -105,7 +105,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨b£©Volume of LA (ml)','fontsize',10)
-axis([20 160 0 60]) 
+axis([40 160 0 80]) 
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=100/step+200:100/step+1800;  
@@ -115,7 +115,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨b£©Volume of LA (ml)','fontsize',10)
-axis([20 160 0 60]) 
+axis([40 160 0 80])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=200/step+200:200/step+1800;  
@@ -125,7 +125,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨b£©Volume of LA (ml)','fontsize',10)
-axis([20 160 0 60]) 
+axis([40 160 0 80])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=300/step+200:300/step+1800;  
@@ -135,7 +135,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨b£©Volume of LA (ml)','fontsize',10) 
-axis([20 160 0 60]) 
+axis([40 160 0 80])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=400/step+200:400/step+1800;  
@@ -145,7 +145,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨b£©Volume of LA (ml)','fontsize',10)
-axis([20 160 0 60]) 
+axis([40 160 0 80])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=600/step+200:600/step+1800;  
@@ -155,7 +155,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨b£©Volume of LA (ml)','fontsize',10)
-axis([20 160 0 60]) 
+axis([40 160 0 80]) 
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=680/step+200:680/step+1800;  
@@ -165,7 +165,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨b£©Volume of LA (ml)','fontsize',10)
-axis([20 160 0 60]) 
+axis([40 160 0 80])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=698/step+200:698/step+1800;  
@@ -175,7 +175,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨b£©Volume of LA (ml)','fontsize',10)
-axis([20 160 0 60]) 
+axis([40 160 0 80])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 %% P-V loop of right ventricle
@@ -186,7 +186,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨c£©Volume of RV (ml)','fontsize',10)
-axis([20 180 0 80]) 
+axis([20 180 0 100]) 
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=150/step+200:150/step+1800; 
@@ -196,7 +196,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨c£©Volume of RV (ml)','fontsize',10)
-axis([20 180 0 80]) 
+axis([20 180 0 100]) 
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=300/step+200:300/step+1800;  
@@ -206,7 +206,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨c£©Volume of RV (ml)','fontsize',10)
-axis([20 180 0 80])
+axis([20 180 0 120])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=550/step+200:550/step+1800; 
@@ -216,7 +216,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨c£©Volume of RV (ml)','fontsize',10)
-axis([20 180 0 80])
+axis([20 180 0 100])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=640/step+200:640/step+1800; 
@@ -226,7 +226,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨c£©Volume of RV (ml)','fontsize',10)
-axis([20 180 0 80])
+axis([20 180 0 120])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=670/step+200:670/step+1800; 
@@ -236,7 +236,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨c£©Volume of RV (ml)','fontsize',10)
-axis([20 180 0 80])
+axis([20 180 0 100])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=698/step+200:698/step+1800;  
@@ -246,7 +246,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨c£©Volume of RV (ml)','fontsize',10)
-axis([20 180 0 80])
+axis([20 180 0 100])
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 %% P-V loop of right atrium

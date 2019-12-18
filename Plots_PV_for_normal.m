@@ -25,7 +25,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨b£©Volume of LA (ml)','fontsize',10)
-axis([40 120 0 30]) 
+axis([20 160 0 40]) 
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 %% The P-V loop of right ventricle
@@ -47,5 +47,5 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨d£©Volume of RA (ml)','fontsize',10)
-axis([40 120 0 30]) 
+axis([20 140 0 30]) 
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)

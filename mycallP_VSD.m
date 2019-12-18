@@ -18,18 +18,18 @@ function P=mycallP_VSD(Vx,t,Fcon,cham,BN)
 
 %The values of parameters in P-V relationship of four heart chambers
 %----LV         RV          LA         RA   
-Ees=[4.3        0.8         0.3       0.3   ];
-M0=[1.7        0.67         0.5       0.5   ];
-V0=[25          25          20        20    ];
-Vd=[40          40          20        20    ];
-lamda=[0.015   0.015     0.025       0.025  ];
+Ees=[4.3        0.8        0.3       0.3   ];
+M0=[1.7         0.67       0.5       0.5   ];
+V0=[25          25         20        20    ];
+Vd=[40          40         20        20    ];
+lamda=[0.015   0.015      0.025      0.025 ];
 
 if cham==2 %---RV
-    k8=0.0012;
-    Ees(2)=Ees(2)+k8*BN;
+    krv_v=0.0012;
+    Ees(2)=Ees(2)+krv_v*BN;
 elseif cham==3 %---LA
-    k9= 0.0004;
-    Ees(3)=Ees(3)+k9*BN;
+    kla_v= 0.0003;
+    Ees(3)=Ees(3)+kla_v*BN;
 end
 
 % The values of parameters in  activation function of four heart chambers

@@ -17,16 +17,16 @@ clear all
 tic  % to start a timer 
  
 %%  Load the initial values of resistances
-%   Rm     Ra   Rhaa  Rlna  Rlca  Raop  Rrula  Rrica  Rlica  Rlula  Rsap  Rrsv
-R=[0.015  0.02   12    14    14   1.1    0.4    0.4    0.4    0.4    0.5   0.17 ...  
-    0.2    0.2   0.2   0.2   0.033  0.02  0.01  0.02   0.02   0.03   0.03   0.045  0.045];
-%  Rrijv  Rlijv  Rlsv  Rsv    Rvc    Rt    Rp   Rrpap  Rlpap  Rrpad  Rlpad   Rrpv   Rlpv   
+%   Rm     Ra   Rhaa  Rlna  Rlca  Raop  Rrula  Rrica  Rlica  Rlula  Rsap   Rrsv
+R=[0.02   0.02   10    12    12   1.2    0.5    0.5    0.5    0.5    0.5   0.27 ...  
+   0.25    0.25   0.25   0.2   0.04   0.03  0.01   0.05    0.05    0.06   0.06   0.07   0.07];
+%  Rrijv  Rlijv   Rlsv   Rsv    Rvc    Rt    Rp    Rrpap   Rlpap   Rrpad  Rlpad   Rrpv   Rlpv   
 
 %% Load the initial values of compliances    
-% Chaa  Clna  Clca  Caop   Crula  Crica  Clica  Clula  Csap   Crsv    
-C=[1     1     1     0.8     3      2      4      2     5      10 ...
-   10    10    10   20   30    10     10     23     23     25   25 ];
-% Crijv Clijv Clsv  Csv  Cvc  Crpap  Clpap  Crpad  Clpad  Crpv  Clpv
+% Chaa   Clna    Clca   Caop   Crula  Crica  Clica  Clula  Csap   Crsv    
+C=[0.7    0.7    0.7     0.8     3      2      3      2      5      9 ...
+    9     9     9    10   15   1.5    1.5     9      9     15     15 ];
+% Crijv Clijv  Clsv  Csv  Cvc  Crpap  Clpap  Crpad  Clpad  Crpv   Clpv    
 
 %% Load the initial values of viscoelastic resistances
 %  Rchaa  Rclna  Rclca  Rcaop   Rcrpap  Rclpap  Rcrpad   Rclpad   Rrpv    Rlpv
@@ -44,10 +44,9 @@ L=[0.001  0.001  0.001 ];
 %----------Vrpv  Vlpv   Vla   
 
 %% Load initial values at t=0s
-% Include heart chamber and vascular volume, and systemic and pulmonary aorta flow,
-
-load yinit_DPAS.mat     
-yinit=yinit_DPAS;    
+% Include the initial conditions of the blood volumes in four chambers, vessels and the blood flows in systemic and pulmonary aorta flows.
+load yinit_DPAS.mat       
+yinit=yinit_DPAS; 
 
 %% Adjustable part
 Tall=700;  % Simulation  duration, time in seconds
@@ -69,7 +68,7 @@ num=1;  % Record the number of simulation steps
 
 allP=zeros(samNum+1,25);  % All blood pressure values at each moment
 allV=zeros(samNum+1,25);  % All volume values at each moment
-allD=zeros(samNum+1,19);  % Valve status at each moment (1: open; 0: close)
+allD=zeros(samNum+1,17);  % Valve status at each moment (1: open; 0: close)
 allQ=zeros(samNum+1,35);  % All blood flow values at each moment
 allC=zeros(samNum+1,2);   % [Rrpad   Rlpad];
 allR=zeros(samNum+1,2);   % [Crpad   Clpad];
@@ -126,14 +125,16 @@ for t=0:step:Tall
     Plpap=-Klpap_0*log(1-(Vrpap/Vm_lpap));  
     
     %% Nonlinear P-V relation for distal pulmonary arteries due to stenosis
-    g_r=0.043743;
-    r=(1+g_r*beatNum)^(-1/4); 
-    R(22)=((1/r)^4)*0.03;  %Rrpad
-    R(23)=((1/r)^4)*0.03;  %Rlpad
+    g_r=0.018;
+    r0=1; % r0 is the initial radius
+    r=r0*(1+g_r*beatNum)^(-1/4); 
+    Rrpad_0=0.06; Rlpad_0=0.06;
+    R(22)=((1/r)^4)*Rrpad_0; %Rrpad
+    R(23)=((1/r)^4)*Rlpad_0; %Rlpad
     allR(num,:)=[R(22) R(23)];    
     
     %%  Trc(t)=R*C
-    Trc_0=0.69;  % Trc_0 is the initial values of  RC-time
+    Trc_0=0.54;  % Trc_0 is the initial values of  RC-time
     trc=0.0008;  
     Trc=Trc_0*exp(-trc*beatNum);  % RC-time decreases over time
             
@@ -200,18 +201,17 @@ for t=0:step:Tall
     Dt=Pra>Prv; 
     D9=Prv>Prpap;   D10=Prv>Plpap; 
     Dp=D9|D10;
-    D11=Prpv>Pla; D12=Plpv>Pla;
-      
+
     Q2=D1*Q3+D2*Q4+D3*Q5+D4*Q6; 
     Q7=D51*Q71+D52*Q72;  
     Q77=D53*Q16+D54*Q17;
     Q23=D9*Q240+D10*Q250;
-    Q30=D11*Q28+D12*Q29;
+    Q30=Q28+Q29;
     
     %% Solution of differential equations
     % Convert differential equations into difference equations,
     % Q(t+step)-Q(t)=step*I(t), I(t+step)-I(t)=step*U(t)/L,
-    
+
     %% Recursive calculation 
     Eright(1)=Dm*Q1-Da*Q2;
     Eright(2)=D1*Q3-D51*Q71-D52*Q72;
@@ -239,9 +239,9 @@ for t=0:step:Tall
     Eright(23)=(Plpap-Q25*R(21)-Plpad)/L(3); 
     Eright(24)=Q24-Q26;
     Eright(25)=Q25-Q27;
-    Eright(26)=Q26-D11*Q28;
-    Eright(27)=Q27-D12*Q29;
-    Eright(28)=D11*Q28+D12*Q29-Dm*Q1; 
+    Eright(26)=Q26-Q28;
+    Eright(27)=Q27-Q29;
+    Eright(28)=Q28+Q29-Dm*Q1; 
    
     allQ1(num)=Q2*Da;
     allQ2(num)=Q1*Dm;
@@ -263,11 +263,8 @@ for t=0:step:Tall
     Q23=Q23*Dp;
     Q240=Q240*D9;
     Q250=Q250*D10;
-    Q28=Q28*D11;
-    Q29=Q29*D12;
  
-    allD(num,:)=[Da Dm Dp Dt D1 D2 D3 D4 D51 D52 D53 D54 D6 D7 D8 D9 D10 D11 D12];
-    %             1  2  3  4  5  6  7  8   9  10  11 12 13  14  15  16  17  18  19  20  21  22  23  24  25  26   27   28  29  30  31  32  33  34  35
+    allD(num,:)=[Da Dm Dp Dt D1 D2 D3 D4 D51 D52 D53 D54 D6 D7 D8 D9 D10];
     allQ(num,:)=[Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q71 Q72 Q77 Q8 Q9 Q10 Q11 Q12 Q13 Q14 Q15 Q16 Q17 Q18 Q19 Q20 Q21 Q22 Q23 Q240 Q250 Q24 Q25 Q26 Q27 Q28 Q29 Q30];
 
     yinit=yinit+step*Eright;

@@ -19,7 +19,7 @@ function P=mycallP_LVDD(Vx,t,Fcon,cham,BN)
 %The  values of parameters in P-V relationship of four heart chambers
 %----LV         RV          LA          RA   
 Ees=[4.3        0.8         0.3        0.3  ];
-M0=[1.7        0.67         0.5        0.5  ];
+M0=[1.7         0.67        0.5        0.5  ];
 V0=[25          25          20         20   ];
 Vd=[40          40          20         20   ];
 lamda=[0.015   0.015     0.025       0.025  ];
@@ -43,20 +43,19 @@ end
 
 % The values of parameters in  activation function of four heart chambers
 if cham==3  %LA
-
     ai_0=[ 0      0     0.9    0      0      0      0       0      0     0      ];
     bi=[ 0.12   0.09   0.038  0.07   0.09   0.05    0.04   0.08   0.1    0.04   ];
     ci=[0.005   0.08   0.14   0.25   0.31   0.375   0.45   0.62   0.784  0.7845 ];
     k_a1=0.00044;
     k_a2=0.000188;
-    k_a3=-0.000575;
+    k_a3=-0.000655;
     k_a4=0.0001;
     k_a5=0.0003;
     k_a6=0.000278;
-    k_a7=0.000491;
-    k_a8=0.000265;
-    k_a9=0.000492;
-    k_a10=0.000045; 
+    k_a7=0.000431;
+    k_a8=0.000275;
+    k_a9=0.000502;
+    k_a10=0.000055;
     ai(1)=ai_0(1,1)+k_a1*BN;
     ai(2)=ai_0(1,2)+k_a2*BN;
     ai(3)=ai_0(1,3)+k_a3*BN;

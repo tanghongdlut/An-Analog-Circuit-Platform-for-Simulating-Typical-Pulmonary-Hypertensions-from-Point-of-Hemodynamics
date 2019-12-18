@@ -145,7 +145,7 @@ grid on
 box on;
 ylabel('BP in mmHg','fontsize',10)
 xlabel('£¨b£©Volume of LA (ml)','fontsize',10)
-axis([20 160 0 70]) 
+axis([20 160 0 70])  
 set(gca,'GridLineStyle','-.','GridColor','k', 'GridAlpha',1)
 
 v1=600/step+200:600/step+1800;  

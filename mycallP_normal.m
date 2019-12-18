@@ -21,7 +21,7 @@ Ees=[4.3        0.8         0.3        0.3   ];
 M0=[1.7         0.67        0.5        0.5   ];
 V0=[25          25          20         20    ];
 Vd=[40          40          20         20    ];
-lamda=[0.015   0.015     0.025       0.025   ];
+lamda=[0.015    0.015       0.025      0.025 ];
 
 % The values of parameters in  activation function of four heart chambers
 %||---------------ventricle------------||----atrium---||

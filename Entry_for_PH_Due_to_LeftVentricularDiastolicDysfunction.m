@@ -17,16 +17,16 @@ clear all
 tic
     
 %%  Load the initial values of resistances 
-%   Rm      Ra   Rhaa  Rlna  Rlca  Raop  Rrula  Rrica  Rlica  Rlula  Rsap  Rrsv
- R=[0.015  0.02   9     12    12   1.1    0.4    0.4    0.4    0.4    0.5  0.17 ...  
-    0.2    0.2   0.2   0.2  0.033  0.02  0.01  0.02   0.02   0.03   0.03  0.045  0.045];
-%  Rrijv  Rlijv  Rlsv  Rsv   Rvc    Rt    Rp   Rrpap  Rlpap  Rrpad  Rlpad  Rrpv   Rlpv   
+%   Rm    Ra   Rhaa  Rlna  Rlca  Raop  Rrula  Rrica  Rlica  Rlula  Rsap  Rrsv
+R=[0.02   0.02   9    13    13   1.2    0.5    0.5    0.5    0.5    0.5   0.27 ...  
+    0.25    0.25    0.25   0.2   0.04   0.03  0.01    0.05   0.05    0.06   0.06   0.07   0.07];
+%  Rrijv   Rlijv    Rlsv   Rsv    Rvc    Rt    Rp    Rrpap   Rlpap   Rrpad  Rlpad   Rrpv   Rlpv   
 
 %% Load the initial values of capacitors    
-% Chaa  Clna  Clca  Caop  Crula  Crica  Clica  Clula  Csap  Crsv    
- C=[1     1    1    0.8     3      2      4      2      5    10  ...
-   10     10     10   20    30    10    10     23     23    25    25];
-% Crijv  Clijv  Clsv  Csv  Cvc  Crpap  Clpap  Crpad  Clpad  Crpv  Clpv
+% Chaa   Clna   Clca   Caop  Crula  Crica  Clica  Clula  Csap  Crsv    
+C=[0.7    0.7    0.7   0.8     3      2      3      2      5    9 ...
+    9      9     9    10    15     1.5      1.5     9      9       15     15 ];
+% Crijv  Clijv  Clsv  Csv   Cvc    Crpap   Clpap  Crpad   Clpad    Crpv   Clpv
 
 %% Load the initial values of viscoelastic resistances
 %  Rchaa  Rclna  Rclca  Rcaop   Rcrpap  Rclpap  Rcrpad   Rclpad   Rrpv    Rlpv
@@ -44,10 +44,9 @@ L=[0.001  0.001  0.001 ];
 %----------Vrpv  Vlpv   Vla   
 
 %% Load initial values at t=0s
-% Include heart chamber and vascular volume, and systemic and pulmonary aorta flow,
-
-load yinit_LVDD.mat  
-yinit=yinit_LVDD;    
+% Include the initial conditions of the blood volumes in four chambers, vessels and the blood flows in systemic and pulmonary aorta flows.
+load yinit_LVDD.mat       
+yinit=yinit_LVDD;  
 
 %% Adjustable part
 Tall=700;    % Simulation  duration, time in seconds
@@ -69,7 +68,7 @@ num=1;  % Record the number of simulation steps
  
 allP=zeros(samNum+1,25);  % All blood pressure values at each moment
 allV=zeros(samNum+1,25);  % All volume values at each moment
-allD=zeros(samNum+1,19);  % Valve status at each moment (1: open; 0: close)
+allD=zeros(samNum+1,17);  % Valve status at each moment (1: open; 0: close)
 allQ=zeros(samNum+1,35);  % All blood flow values at each moment
 allR=zeros(samNum+1,6);   %[Rrpap Rlpap Rrpad Rlpad Rrpv Rlpv]
 allC=zeros(samNum+1,6);   %[Crpap Clpap Crpad Clpad Crpv Clpv]
@@ -120,7 +119,7 @@ for t=0:step:Tall
 
     k5=0.035;   
     k6=0.035;
-    k7=0.005; 
+    k7=0.02; 
     Prpap=-(Krpap_0+k5*beatNumN)*log(1-(Vrpap/Vm_rpap));
     Plpap=-(Klpap_0+k5*beatNumN)*log(1-(Vrpap/Vm_lpap));
     Prpad=-(Krpad_0+k6*beatNumN)*log(1-(Vrpad/Vm_rpad));
@@ -155,32 +154,32 @@ for t=0:step:Tall
  if beatNum>1
     % The vascular compliance decreases with increasing mean pressure.
     % C(P)=g_c*exp(-h_c*P)   
-       g_cpl=14; h_cpl=0.039;       
+       g_cpl=3; h_cpl=0.035;    
        C(16)=g_cpl*exp(-h_cpl*mPAP_rpap(beatNum-1,:)); 
        C(17)=g_cpl*exp(-h_cpl*mPAP_lpap(beatNum-1,:));
-       g_cdl=20; h_cdl=0.035; 
+       g_cdl=14; h_cdl=0.031; 
        C(18)=g_cdl*exp(-h_cdl*mPAP_rpad(beatNum-1,:));
        C(19)=g_cdl*exp(-h_cdl*mPAP_lpad(beatNum-1,:));
-       g_cvl=25; h_cvl=0.03; 
+       g_cvl=20; h_cvl=0.03; 
        C(20)=g_cvl*exp(-h_cvl*mPAP_rpv(beatNum-1,:));
        C(21)=g_cvl*exp(-h_cvl*mPAP_lpv(beatNum-1,:));
        allC(num,:)=[C(16) C(17) C(18) C(19) C(20) C(21)]; 
        
        %%  Trc(t)=R*C
-       Trpap_0=0.2; % Trpap_0 is the initial values of  RC-time in proximal right pulmonary artery
-       trpap_l=0.00012;
-       Tlpap_0=0.2; % Tlpap_0 is the initial values of  RC-time in proximal left pulmonary artery
-       tlpap_l=0.00012;       
+       Trpap_0=0.075; % Trpap_0 is the initial values of  RC-time in proximal right pulmonary artery
+       trpap_l=0.00055;
+       Tlpap_0=0.075; % Tlpap_0 is the initial values of  RC-time in proximal left pulmonary artery
+       tlpap_l=0.00055; 
        
-       Trpad_0=0.45; % Trpad_0 is the initial values of  RC-time in distal right pulmonary artery
-       trpad_l=0.0001;
-       Tlpad_0=0.45; % Tlpad_0 is the initial values of  RC-time in distal left pulmonary artery
-       tlpad_l=0.0001;       
+       Trpad_0=0.54; % Trpad_0 is the initial values of  RC-time in distal right pulmonary artery
+       trpad_l=0.0004;
+       Tlpad_0=0.54; % Tlpad_0 is the initial values of  RC-time in distal left pulmonary artery
+       tlpad_l=0.0004;       
        
-       Trpv_0=0.85; % Trpv_0 is the initial values of  RC-time in right pulmonary vein 
-       trpv_l=0.00009;
-       Tlpv_0=0.85; % Tlpv_0 is the initial values of  RC-time in left pulmonary vein 
-       tlpv_l=0.00009;      
+       Trpv_0=1.05; % Trpv_0 is the initial values of  RC-time in right pulmonary vein 
+       trpv_l=0.00005;
+       Tlpv_0=1.05; % Tlpv_0 is the initial values of  RC-time in left pulmonary vein 
+       tlpv_l=0.00005;      
        
        Trpap=Trpap_0*exp(-trpap_l*beatNum); % RC-time decreases over time in proximal right pulmonary artery
        Tlpap=Tlpap_0*exp(-tlpap_l*beatNum); % RC-time decreases over time in proximal left pulmonary artery
@@ -199,12 +198,12 @@ for t=0:step:Tall
        R(25)=Tlpv/C(21); %Rlpv
        allR(num,:)=[R(20) R(21) R(22) R(23) R(24) R(25)];  
  else
-       R(20)=0.02;
-       R(21)=0.02;
-       R(22)=0.03;
-       R(23)=0.03;
-       R(24)=0.045;
-       R(25)=0.045;
+       R(20)=0.05;
+       R(21)=0.05;
+       R(22)=0.06;
+       R(23)=0.06;
+       R(24)=0.07;
+       R(25)=0.07;
        allR(num,:)=[R(20) R(21) R(22) R(23) R(24) R(25)];  
  end
 
@@ -240,16 +239,14 @@ for t=0:step:Tall
     D6=Plijv>Pvc;  D7=Plsv>Pvc;   D8=Psv>Pvc;  
     
     Dt=Pra>Prv; 
-    D9=Prv>Prpap;   D10=Prv>Plpap; 
- 
+    D9=Prv>Prpap;   D10=Prv>Plpap;  
     Dp=D9|D10;
-    D11=Prpv>Pla; D12=Plpv>Pla;  
-
+                       
     Q2=D1*Q3+D2*Q4+D3*Q5+D4*Q6; 
     Q7=D51*Q71+D52*Q72;  
     Q77=D53*Q16+D54*Q17;
     Q23=D9*Q240+D10*Q250;
-    Q30=D11*Q28+D12*Q29;
+    Q30=Q28+Q29;
     
    %% Solution of differential equations
     % Convert differential equations into difference equations,
@@ -282,9 +279,9 @@ for t=0:step:Tall
     Eright(23)=(Plpap-Q25*R(21)-Plpad)/L(3); 
     Eright(24)=Q24-Q26;
     Eright(25)=Q25-Q27;
-    Eright(26)=Q26-D11*Q28;
-    Eright(27)=Q27-D12*Q29;
-    Eright(28)=D11*Q28+D12*Q29-Dm*Q1; 
+    Eright(26)=Q26-Q28;
+    Eright(27)=Q27-Q29;
+    Eright(28)=Q28+Q29-Dm*Q1; 
    
     allQ1(num)=Q2*Da;
     allQ2(num)=Q1*Dm;
@@ -305,10 +302,8 @@ for t=0:step:Tall
     Q23=Q23*Dp;
     Q240=Q240*D9;
     Q250=Q250*D10;
-    Q28=Q28*D11;
-    Q29=Q29*D12;
 
-    allD(num,:)=[Da Dm Dp Dt D1 D2 D3 D4 D51 D52 D53 D54 D6 D7 D8 D9 D10 D11 D12];
+    allD(num,:)=[Da Dm Dp Dt D1 D2 D3 D4 D51 D52 D53 D54 D6 D7 D8 D9 D10];
     allQ(num,:)=[Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q71 Q72 Q77 Q8 Q9 Q10 Q11 Q12 Q13 Q14 Q15 Q16 Q17 Q18 Q19 Q20 Q21 Q22 Q23 Q240 Q250 Q24 Q25 Q26 Q27 Q28 Q29 Q30];
 %                                                                                                            26  27   28  29  30   31  32  33  34  35
     yinit=yinit+step*Eright;

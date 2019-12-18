@@ -19,14 +19,14 @@ function P=mycallP(Vx,t,Fcon,cham,BN)
 %The values of parameters in P-V relationship of four heart chambers
 %----LV         RV          LA          RA   
 Ees=[4.3        0.8         0.3        0.3   ];
-M0=[1.7        0.67         0.5        0.5   ];
-V0=[25          25          20          20   ];
-Vd=[40          40          20          20   ];
-lamda=[0.015   0.015     0.025       0.025   ];
+M0=[1.7         0.67        0.5        0.5   ];
+V0=[25          25          20         20    ];
+Vd=[40          40          20         20    ];
+lamda=[0.015    0.015       0.025     0.025  ];
 
 if cham==2 %---RV
-    k8=0.0012;
-    Ees(2)=Ees(2)+k8*BN;
+    krv_m=0.0012;
+    Ees(2)=Ees(2)+krv_m*BN;
 elseif cham==3 %---LA
     k13=0.0003;
     k14=0.001;
@@ -41,10 +41,10 @@ if cham==3 %---LA
     Xi_0=[  0.9      0     0    ];
     Yi=[   0.038   0.05   0.05  ];
     Zi=[   0.145   0.37   0.42  ];
-    kla=0.000336;
+    k_x1=0.000336;
     k_x2=0.000168;
     k_x3=0.000168;
-    Xi(1,1)= Xi_0(1,1)-kla*BN; 
+    Xi(1,1)= Xi_0(1,1)-k_x1*BN; 
     Xi(1,2)= Xi_0(1,2)+k_x2*BN ;
     Xi(1,3)= Xi_0(1,3)+k_x3*BN ;
 else
@@ -92,7 +92,7 @@ else if cham==2    %RV
     En=0; 
 
     for i=1:3   
-        En=En+Xi(i)*exp(-0.5*(((t-Zi(i))/Yi(i)).^2))+kla*BN;  
+        En=En+Xi(i)*exp(-0.5*(((t-Zi(i))/Yi(i)).^2))+k_x1*BN;  
     end
 
     Pes=Ees(cham)*(Vx-Vd(cham));
