@@ -1,6 +1,6 @@
 % This script is a simulation program for pulmonary hypertension due to mitral stenosis 
 % based on an analog circuit platform.
-% The circuit platform is shown in a document  "Figure_analog_circuit_platform_for_VSD.docx"
+% The circuit platform is shown in a document  "Figure_analog_circuit_platform.docx"
 % The simulation time is 700s. A cardiac cycle is 0.7845s (heart rate is about 76.5 beat per minute). 
 % The time step size in numerical solution is 0.0005s. 
 % The total blood volume in the circulation system is 4711 ml.
@@ -171,7 +171,7 @@ for t=0:step:Tall
        %%  Trc(t)=R*C
        Trpap_0=0.075;  % Trpap_0 is the initial values of  RC-time in proximal right pulmonary artery
        trpap_m=0.00075;
-       Tlpap_0=0.09;  % Tlpap_0 is the initial values of  RC-time in proximal left pulmonary artery
+       Tlpap_0=0.075;  % Tlpap_0 is the initial values of  RC-time in proximal left pulmonary artery
        tlpap_m=0.00075;
        
        Trpad_0=0.54; % Trpad_0 is the initial values of  RC-time in distal right pulmonary artery
